@@ -7,14 +7,14 @@
 <meta name="description" content="支点 Fulcrum：帮非技术背景的职场人与中小企业经营者，把 AI 真正用进工作与生意的实战伙伴。" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
 tailwind.config = {
   theme: { extend: {
     fontFamily: {
-      sans: ['Manrope', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-      mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'monospace'],
+      sans: ['Space Grotesk', 'Noto Sans SC', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+      mono: ['IBM Plex Mono', 'Noto Sans SC', 'ui-monospace', 'SFMono-Regular', 'monospace'],
     },
     colors: { brass: '#2438E6' },
   } },
@@ -23,11 +23,17 @@ tailwind.config = {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.14.2/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.14.2/ScrollTrigger.min.js"></script>
 <style>
-  html { scroll-behavior: smooth; }
+  html { scroll-behavior: smooth; scroll-padding-top: 5.5rem; }
   body { background: #000; }
   ::selection { background: #2438E6; color: #fff; }
+  #chain, #about, #contact { scroll-margin-top: 5.5rem; }
 
-  /* 视频铺满（禁止给 video 加 blend / opacity，染色用独立 overlay） */
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    [data-reveal] { opacity: 1; transform: none; transition: none; }
+    .load-ring::before { animation: none; border-color: #2438E6; }
+  }
+
   #video-bg video {
     position: absolute; top: 50%; left: 50%;
     transform: translate(-50%, -50%);
@@ -35,21 +41,60 @@ tailwind.config = {
     object-fit: cover;
   }
 
-  /* loading 屏：与 JS 的 body[data-loaded] 配套淡出 */
-  #loading { transition: opacity 0.4s; }
-  body[data-loaded="true"] #loading { opacity: 0; visibility: hidden; pointer-events: none; }
-  .loading-bar { animation: load 1.2s ease-in-out infinite; }
-  @keyframes load { 0% { transform: translateX(-120%); } 100% { transform: translateX(340%); } }
+  #loading {
+    transition: opacity 0.55s ease, visibility 0.55s;
+  }
+  body[data-entered="true"] #loading {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+  body.loading-lock { overflow: hidden; }
 
-  /* 主内容层默认不截获事件，互动元素单独打开 */
+  .load-ring {
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.12);
+    position: relative;
+    display: grid; place-items: center;
+  }
+  .load-ring::before {
+    content: '';
+    position: absolute; inset: -1px;
+    border-radius: 50%;
+    border: 1px solid transparent;
+    border-top-color: #2438E6;
+    animation: spin 1s linear infinite;
+  }
+  body[data-ready="true"] .load-ring::before {
+    animation: none;
+    border-color: #2438E6;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .load-track {
+    width: min(280px, 70vw);
+    height: 2px;
+    background: rgba(255,255,255,0.12);
+    overflow: hidden;
+    position: relative;
+  }
+  .load-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #2438E6, #6b7cff);
+    transition: width 0.2s ease-out;
+  }
+
+  .load-pct { font-variant-numeric: tabular-nums; }
+  .load-busy { transition: opacity 0.35s ease, transform 0.35s ease; }
+
   .pointer-on { pointer-events: auto; }
 
-  /* GSAP 大字逐词浮现 */
   .scroll-reveal { margin: 0; }
   .scroll-reveal-text { display: flex; flex-wrap: wrap; margin: 0; }
   .word { display: inline-block; white-space: pre; }
 
-  /* IntersectionObserver 淡入上浮 */
   [data-reveal] {
     opacity: 0;
     transform: translateY(30px);
@@ -60,20 +105,98 @@ tailwind.config = {
   }
   [data-reveal="visible"] { opacity: 1; transform: translateY(0); }
 
-  /* marquee */
-  .marquee-track { display: flex; width: max-content; animation: marquee 30s linear infinite; }
-  @keyframes marquee { to { transform: translateX(-50%); } }
+  .track-en { letter-spacing: 0.22em; }
+  .track-meta { letter-spacing: 0.12em; }
+  .track-tight { letter-spacing: -0.03em; }
+
+  /* 工具站：品牌蓝透明度渐变，铺到右缘 */
+  .tool-station {
+    margin-right: -1.5rem; /* 抵消 section px-6 */
+  }
+  @media (min-width: 768px) {
+    .tool-station { margin-right: -3rem; } /* 抵消 md:px-12 */
+  }
+  .tool-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.35rem 3.5rem 1.35rem 2.5rem;
+    color: #fff;
+    background: linear-gradient(
+      90deg,
+      rgba(36, 56, 230, 0.72) 0%,
+      rgba(36, 56, 230, 0.38) 48%,
+      rgba(36, 56, 230, 0.1) 100%
+    );
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: none;
+    transition: background 0.35s ease, transform 0.25s ease;
+  }
+  @media (min-width: 768px) {
+    .tool-cta { padding: 1.6rem 4.5rem 1.6rem 3rem; }
+  }
+  .tool-cta:hover {
+    background: linear-gradient(
+      90deg,
+      rgba(36, 56, 230, 0.92) 0%,
+      rgba(36, 56, 230, 0.55) 50%,
+      rgba(36, 56, 230, 0.18) 100%
+    );
+  }
+  .tool-cta:hover svg { opacity: 1; transform: translateX(3px); }
+
+  /* 联系我们 · 二维码小弹框 */
+  #qr-modal {
+    position: fixed; inset: 0; z-index: 60;
+    display: grid; place-items: center;
+    padding: 1.25rem;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    opacity: 0; visibility: hidden; pointer-events: none;
+    transition: opacity 0.25s ease, visibility 0.25s;
+  }
+  #qr-modal.is-open {
+    opacity: 1; visibility: visible; pointer-events: auto;
+  }
+  #qr-modal .qr-panel {
+    width: 220px;
+    background: #111;
+    border: 1px solid rgba(255,255,255,0.14);
+    padding: 1rem 1rem 0.9rem;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.45);
+    transform: translateY(10px) scale(0.94);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  #qr-modal.is-open .qr-panel { transform: translateY(0) scale(1); }
+  #qr-modal img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 4px;
+  }
 </style>
 </head>
-<body class="font-sans text-white antialiased bg-black">
+<body class="font-sans text-white antialiased bg-black loading-lock">
 
-<!-- z-50 Loading 屏 -->
-<div id="loading" class="fixed inset-0 z-50 bg-black flex flex-col items-center justify-center gap-7">
-  <img src="logo.svg" alt="支点 Fulcrum" class="h-12 w-auto" />
-  <div class="w-44 h-px bg-white/15 overflow-hidden"><div class="loading-bar h-full w-1/4 bg-brass"></div></div>
+<!-- Loading：进度完成后自动进站 -->
+<div id="loading" class="fixed inset-0 z-50 bg-black flex flex-col items-center justify-center gap-8 px-6">
+  <div class="load-busy flex flex-col items-center gap-8">
+    <div class="load-ring">
+      <img src="logo.svg" alt="支点 Fulcrum" class="h-8 w-auto" />
+    </div>
+    <div class="text-center">
+      <p class="font-mono text-[11px] track-en text-white/40 uppercase mb-3">Initializing</p>
+      <p class="load-pct font-mono text-4xl md:text-5xl font-semibold track-tight tabular-nums">
+        <span id="load-num">0</span><span class="text-brass text-2xl md:text-3xl align-super">%</span>
+      </p>
+    </div>
+    <div class="load-track"><div id="load-fill" class="load-fill"></div></div>
+  </div>
 </div>
 
-<!-- z-0 固定视频背景 -->
+<!-- 视频背景 -->
 <div id="video-bg" class="fixed inset-0 z-0 bg-black">
   <video id="hero-video" muted playsinline preload="auto">
     <source src="hero.mp4" type="video/mp4" />
@@ -81,247 +204,219 @@ tailwind.config = {
   <div class="absolute inset-0 bg-gradient-to-b from-black/70 via-black/25 to-black/80 pointer-events-none"></div>
 </div>
 
-<!-- z-20 顶栏 -->
+<!-- 顶栏：Logo 左 · 四字导航右 -->
 <header class="fixed top-0 inset-x-0 z-20 border-b border-white/10 bg-black/30 backdrop-blur-md">
   <div class="px-6 md:px-12 h-16 flex items-center justify-between">
-    <a href="#top" class="pointer-on flex items-center group">
+    <a href="#top" class="pointer-on flex items-center">
       <img src="logo.svg" alt="支点 Fulcrum" class="h-7 w-auto" />
     </a>
-    <nav class="hidden md:flex items-center gap-9 font-mono text-xs tracking-[0.25em] text-white/60">
-      <a href="#chain" class="pointer-on hover:text-white transition-colors">链路</a>
-      <a href="#about" class="pointer-on hover:text-white transition-colors">关于</a>
-      <a href="#kaiwu" class="pointer-on hover:text-white transition-colors">开物</a>
-      <a href="#contact" class="pointer-on hover:text-white transition-colors">联系</a>
+    <nav class="flex items-center gap-6 md:gap-10 font-mono text-xs track-meta text-white/60">
+      <a href="#about" class="pointer-on hover:text-white transition-colors">关于支点</a>
+      <a href="#chain" class="pointer-on hover:text-white transition-colors">服务流程</a>
+      <a href="https://www.z48704.cloud/" target="_blank" rel="noopener noreferrer" class="pointer-on hover:text-white transition-colors">在线工具</a>
+      <a href="#contact" data-open-qr class="pointer-on bg-white text-black px-5 py-2 hover:bg-white/90 transition-colors">联系我们</a>
     </nav>
-    <a href="#contact" class="pointer-on font-mono text-xs tracking-[0.25em] border border-white/25 px-5 py-2 hover:bg-white hover:text-black transition-colors">开始撬动</a>
   </div>
 </header>
 
-<!-- z-10 主内容 -->
 <main class="relative z-10 pointer-events-none">
 
-  <!-- Hero -->
-  <section id="top" class="relative min-h-screen flex flex-col justify-end px-6 md:px-12 pt-32 pb-8">
-    <div id="hero-inner">
-      <p data-hero class="font-mono text-[11px] md:text-xs tracking-[0.35em] text-brass uppercase mb-6">
-        AI 实战伙伴 — For people who don't speak tech
-      </p>
-      <h1 class="font-semibold tracking-tight leading-[0.98] text-[13.5vw] md:text-[9vw]">
-        <span data-hero class="block">找到支点，</span>
-        <span data-hero class="block">撬动结果<span class="text-brass">。</span></span>
-      </h1>
-      <div class="mt-10 md:mt-14 grid md:grid-cols-12 gap-8 items-end">
-        <p data-hero class="md:col-span-5 text-base md:text-lg leading-relaxed text-white/70">
-          我们帮<span class="font-semibold text-white">非技术背景的职场人与中小企业经营者</span>，把
-          AI 真正用进工作与生意。<span class="font-semibold text-white">不教概念，不卖焦虑</span>——把一件具体的事，办成。
+  <!-- Hero：左下标题 · 右上副文案 · 右侧工具站（略离边，可点） -->
+  <section id="top" class="relative min-h-screen flex flex-col px-6 md:px-12 pt-28 pb-20 md:pb-28">
+    <p data-hero class="md:absolute md:top-36 md:right-12 md:max-w-xs ml-auto max-w-sm text-base md:text-lg leading-relaxed text-white/70 mb-10 md:mb-0">
+      帮非技术背景的职场人与中小企业经营者，把 AI 真正用进工作与生意。
+      <span class="block mt-3 font-semibold text-white">技术隐形，结果可见。</span>
+    </p>
+
+    <div id="hero-inner" class="mt-auto flex flex-col md:flex-row md:items-end md:justify-between gap-10 md:gap-16">
+      <div class="max-w-3xl">
+        <h1 class="font-bold track-tight leading-[0.92] text-[9.5vw] md:text-[6.5vw]">
+          <span data-hero class="block">找到支点，</span>
+          <span data-hero class="block">撬动结果<span class="text-brass">。</span></span>
+        </h1>
+        <p data-hero class="mt-8 font-mono text-sm md:text-base track-meta text-white/55">
+          往下滑了解更多 ↓
         </p>
-        <div data-hero class="md:col-span-7 flex flex-wrap md:justify-end items-center gap-5">
-          <a href="#contact" class="pointer-on inline-flex items-center gap-3 border border-white/25 bg-white/5 backdrop-blur-md px-7 py-3.5 text-sm font-semibold tracking-wide hover:bg-white hover:text-black transition-colors">
-            开始撬动
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </div>
+
+      <div data-hero class="tool-station shrink-0 md:mb-2">
+        <a href="https://www.z48704.cloud/" target="_blank" rel="noopener noreferrer" class="pointer-on tool-cta group text-2xl md:text-4xl font-bold track-tight">
+          工具站
+          <svg class="w-6 h-6 md:w-8 md:h-8 opacity-70 transition-all duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+        <ul class="mt-4 space-y-2 font-mono text-xs track-meta text-white/45 px-6" id="tool-links"></ul>
+      </div>
+    </div>
+  </section>
+
+  <div class="h-[80px] md:h-[140px]"></div>
+
+  <!-- 服务流程 -->
+  <section id="chain" class="relative w-[90%] mx-auto flex flex-col justify-center py-10 md:py-16 pointer-events-auto">
+    <div class="max-w-[1200px] w-full">
+      <p class="font-mono text-[11px] track-en text-brass uppercase mb-6" data-reveal>服务流程</p>
+      <h2 data-scroll-reveal data-text-class="font-semibold track-tight text-white text-[clamp(2rem,4.5vw,4rem)] leading-[1.1] w-full">从判断 值不值得做， 到方案设计、 技术落地、 财务与项目跟进 — 我们为 不会用 AI 的人， 搭起一条 完整的 落地链路。</h2>
+    </div>
+  </section>
+
+  <div class="h-[64px] md:h-[100px]"></div>
+
+  <!-- 关于支点 -->
+  <section id="about" class="relative w-[90%] mx-auto py-10 md:py-16 pointer-events-auto">
+    <div class="max-w-[1200px] w-full">
+      <p class="font-mono text-[11px] track-en text-brass uppercase mb-8" data-reveal>关于支点</p>
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-8">
+        <div class="md:col-span-4" data-reveal style="--reveal-delay: 0.05">
+          <div class="flex items-center gap-4">
+            <svg width="71" height="43" viewBox="0 0 71 43" fill="none" stroke="white" stroke-width="1" class="opacity-80" aria-hidden="true">
+              <circle cx="35.5" cy="21.5" r="20" />
+              <ellipse cx="35.5" cy="21.5" rx="8.5" ry="20" />
+              <ellipse cx="35.5" cy="21.5" rx="15" ry="20" />
+              <line x1="15.5" y1="21.5" x2="55.5" y2="21.5" />
+              <path d="M18 11h35" />
+              <path d="M18 32h35" />
+            </svg>
+            <img src="logo.svg" alt="支点 Fulcrum" class="h-[18px] w-auto" />
+          </div>
+          <p class="mt-6 font-mono text-[11px] track-en text-white/50 uppercase leading-relaxed">找到支点，撬动结果</p>
+        </div>
+
+        <div class="md:col-span-4" data-reveal style="--reveal-delay: 0.1">
+          <h3 class="text-xl font-semibold text-white">实战至上 / 结果驱动</h3>
+          <p class="mt-4 text-[15px] text-white/70 leading-relaxed">我们不是教你「懂 AI」，而是在你的具体场景里把麻烦办掉、看到结果。客户侧少学公式，多拿可用的工作流——没结果，不算完。</p>
+        </div>
+
+        <div class="md:col-span-4" data-reveal style="--reveal-delay: 0.15">
+          <h3 class="text-xl font-semibold text-white">坦诚协作 / 知止有度</h3>
+          <p class="mt-4 text-[15px] text-white/70 leading-relaxed">有问题摊开说，接不住就直说。脱胎于中南大学 AI 校友交流群的实战派团队：电商操盘、政企产品、全栈技术、财务自动化、社群运营。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="h-[80px] md:h-[140px]"></div>
+
+  <!-- 页脚 CTA（参考站 Section 3） -->
+  <div id="contact" class="pointer-events-auto pb-12 md:pb-16">
+    <footer class="w-[90%] mx-auto">
+      <div class="border border-white/10 bg-[#1a1a1a]/60 backdrop-blur-[80px] p-8 md:p-12 lg:p-16">
+        <div class="flex flex-wrap items-end justify-between gap-10 border-b border-white/10 pb-12 md:pb-16">
+          <h2 class="text-white text-[clamp(2rem,4.5vw,3.5rem)] font-semibold track-tight leading-[1.05]" data-reveal>
+            把你的麻烦<br />带来给我们看看
+          </h2>
+          <a href="https://www.z48704.cloud/" target="_blank" rel="noopener noreferrer" class="pointer-on group inline-flex items-stretch gap-1">
+            <span class="bg-white text-black px-8 py-5 font-mono text-xs font-bold tracking-tight group-hover:bg-white/90 transition-colors flex items-center">
+              开启你的场景落地
+            </span>
+            <span class="bg-white text-black px-6 py-5 group-hover:bg-white/90 transition-colors flex items-center">
+              <svg class="w-5 h-5 group-hover:translate-x-0.5 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </span>
           </a>
-          <a href="#chain" class="pointer-on font-mono text-xs tracking-[0.25em] text-white/60 hover:text-white transition-colors underline underline-offset-8 decoration-white/30 hover:decoration-white">看看链路 ↓</a>
+        </div>
+
+        <div class="pt-12 md:pt-16 grid grid-cols-2 md:grid-cols-4 gap-10 md:gap-12" data-reveal style="--reveal-delay: 0.05">
+          <div>
+            <img src="logo.svg" alt="支点 Fulcrum" class="h-3.5 w-auto" />
+            <p class="mt-5 text-[13px] text-white/40 leading-relaxed max-w-[220px]">非技术背景职场人与中小企业经营者身边，AI 落地最信得过的实战伙伴。</p>
+          </div>
+          <div>
+            <p class="font-mono text-[10px] tracking-[0.1em] text-white/30 mb-5">公司</p>
+            <ul class="space-y-3 text-sm text-white/60">
+              <li><a href="#about" class="pointer-on hover:text-white transition-colors">关于我们</a></li>
+              <li><a href="#about" class="pointer-on hover:text-white transition-colors">品牌故事</a></li>
+              <li><a href="#contact" data-open-qr class="pointer-on hover:text-white transition-colors">联系我们</a></li>
+            </ul>
+          </div>
+          <div>
+            <p class="font-mono text-[10px] tracking-[0.1em] text-white/30 mb-5">服务</p>
+            <ul class="space-y-3 text-sm text-white/60">
+              <li><a href="#chain" class="pointer-on hover:text-white transition-colors">场景诊断</a></li>
+              <li><a href="#chain" class="pointer-on hover:text-white transition-colors">方案设计</a></li>
+              <li><a href="#chain" class="pointer-on hover:text-white transition-colors">技术落地</a></li>
+              <li><a href="#chain" class="pointer-on hover:text-white transition-colors">项目跟进</a></li>
+            </ul>
+          </div>
+          <div>
+            <p class="font-mono text-[10px] tracking-[0.1em] text-white/30 mb-5">联系</p>
+            <ul class="space-y-3 text-sm text-white/60">
+              <li><a href="https://www.z48704.cloud/" target="_blank" rel="noopener noreferrer" class="pointer-on hover:text-white transition-colors">工具站</a></li>
+              <li><a href="#contact" data-open-qr class="pointer-on hover:text-white transition-colors">企业微信</a></li>
+              <li><a href="mailto:z48704@foxmail.com" class="pointer-on hover:text-white transition-colors">邮件</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="mt-14 pt-8 border-t border-white/10 flex flex-wrap justify-between gap-4 font-mono text-[11px] tracking-[0.1em] text-white/25">
+          <span>支点 FULCRUM. 版权所有.</span>
+          <div class="flex gap-6">
+            <span>隐私政策</span>
+            <span>服务条款</span>
+          </div>
         </div>
       </div>
-      <div data-hero class="mt-12 md:mt-16 flex items-center justify-between border-t border-white/10 pt-4 font-mono text-[10px] tracking-[0.25em] text-white/40 uppercase">
-        <span>发起于 · 中南大学 MBA 校友群</span>
-        <span class="hidden md:inline">技术隐形 / 结果显形</span>
-        <span>Scroll ↓</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- Marquee 场景带 -->
-  <div class="relative border-y border-white/10 bg-black/40 backdrop-blur-md overflow-hidden py-3.5">
-    <div class="marquee-track font-mono text-[11px] tracking-[0.35em] text-white/50 uppercase">
-      <span class="flex items-center">
-        <span class="px-8">电商操盘</span><span class="text-brass">·</span>
-        <span class="px-8">政企产品</span><span class="text-brass">·</span>
-        <span class="px-8">全栈技术</span><span class="text-brass">·</span>
-        <span class="px-8">财务自动化</span><span class="text-brass">·</span>
-        <span class="px-8">社群运营</span><span class="text-brass">·</span>
-        <span class="px-8">判断 — 设计 — 落地 — 跟进</span><span class="text-brass">·</span>
-      </span>
-      <span class="flex items-center" aria-hidden="true">
-        <span class="px-8">电商操盘</span><span class="text-brass">·</span>
-        <span class="px-8">政企产品</span><span class="text-brass">·</span>
-        <span class="px-8">全栈技术</span><span class="text-brass">·</span>
-        <span class="px-8">财务自动化</span><span class="text-brass">·</span>
-        <span class="px-8">社群运营</span><span class="text-brass">·</span>
-        <span class="px-8">判断 — 设计 — 落地 — 跟进</span><span class="text-brass">·</span>
-      </span>
-    </div>
+    </footer>
   </div>
-
-  <!-- GSAP 大字立场 -->
-  <section class="relative px-6 md:px-12 py-[26vh]">
-    <p class="font-mono text-[11px] tracking-[0.35em] text-brass uppercase mb-10">我们的立场 / Position</p>
-    <h2 data-scroll-reveal data-text-class="font-medium tracking-tight text-white text-3xl md:text-5xl leading-snug md:leading-snug max-w-5xl">我们 不教概念 不卖焦虑 从 判断值不值得做 到 方案设计 到 技术落地 再到 财务与项目跟进 陪你把 一件具体的事 从头到尾 真正办成 让技术 在工作里 隐形 让结果 在账面上 显形</h2>
-  </section>
-
-  <!-- 01 链路 -->
-  <section id="chain" class="relative bg-black/40 backdrop-blur-md border-t border-white/10 px-6 md:px-12 py-24 md:py-32">
-    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-14 md:mb-20" data-reveal>
-      <div>
-        <p class="font-mono text-[11px] tracking-[0.35em] text-brass uppercase mb-5">01 — The Chain</p>
-        <h2 class="text-4xl md:text-6xl font-semibold tracking-tight">一条完整的链路</h2>
-      </div>
-      <p class="max-w-xs text-sm leading-relaxed text-white/50">从你带着麻烦来，到结果落在账面上——每一环，都有具体的人负责。</p>
-    </div>
-
-    <div class="group grid md:grid-cols-12 gap-3 md:gap-8 items-baseline border-t border-white/10 py-8 md:py-10" data-reveal style="--reveal-delay: 0.05">
-      <span class="font-mono text-xs text-brass md:col-span-1">01</span>
-      <h3 class="md:col-span-3 text-3xl md:text-4xl font-semibold tracking-tight transition-transform duration-500 group-hover:translate-x-2">判断</h3>
-      <p class="md:col-span-5 text-white/60 leading-relaxed">这件事值不值得做、AI 帮不帮得上忙，先摊开说清楚。接不住的，我们直说。</p>
-      <span class="hidden md:block md:col-span-3 font-mono text-[11px] tracking-[0.25em] text-white/30 uppercase text-right">Worth it or not</span>
-    </div>
-    <div class="group grid md:grid-cols-12 gap-3 md:gap-8 items-baseline border-t border-white/10 py-8 md:py-10" data-reveal style="--reveal-delay: 0.1">
-      <span class="font-mono text-xs text-brass md:col-span-1">02</span>
-      <h3 class="md:col-span-3 text-3xl md:text-4xl font-semibold tracking-tight transition-transform duration-500 group-hover:translate-x-2">设计</h3>
-      <p class="md:col-span-5 text-white/60 leading-relaxed">方案长在你的真实场景里，不长在 PPT 里。客户侧少学公式，多拿可用的工作流。</p>
-      <span class="hidden md:block md:col-span-3 font-mono text-[11px] tracking-[0.25em] text-white/30 uppercase text-right">In your scenario</span>
-    </div>
-    <div class="group grid md:grid-cols-12 gap-3 md:gap-8 items-baseline border-t border-white/10 py-8 md:py-10" data-reveal style="--reveal-delay: 0.15">
-      <span class="font-mono text-xs text-brass md:col-span-1">03</span>
-      <h3 class="md:col-span-3 text-3xl md:text-4xl font-semibold tracking-tight transition-transform duration-500 group-hover:translate-x-2">落地</h3>
-      <p class="md:col-span-5 text-white/60 leading-relaxed">技术隐身进日常工作与生意的流程里。你看到的不是 AI，是麻烦被办掉。</p>
-      <span class="hidden md:block md:col-span-3 font-mono text-[11px] tracking-[0.25em] text-white/30 uppercase text-right">Tech, invisible</span>
-    </div>
-    <div class="group grid md:grid-cols-12 gap-3 md:gap-8 items-baseline border-t border-b border-white/10 py-8 md:py-10" data-reveal style="--reveal-delay: 0.2">
-      <span class="font-mono text-xs text-brass md:col-span-1">04</span>
-      <h3 class="md:col-span-3 text-3xl md:text-4xl font-semibold tracking-tight transition-transform duration-500 group-hover:translate-x-2">跟进</h3>
-      <p class="md:col-span-5 text-white/60 leading-relaxed">财务与项目有人兜底，一路跟到结果出现。没结果，不算完。</p>
-      <span class="hidden md:block md:col-span-3 font-mono text-[11px] tracking-[0.25em] text-white/30 uppercase text-right">Till it pays off</span>
-    </div>
-  </section>
-
-  <!-- 02 关于 / 价值观 -->
-  <section id="about" class="relative bg-black/40 backdrop-blur-md border-t border-white/10 px-6 md:px-12 py-24 md:py-32 grid md:grid-cols-12 gap-12 md:gap-16">
-    <div class="md:col-span-5">
-      <p class="font-mono text-[11px] tracking-[0.35em] text-brass uppercase mb-5" data-reveal>02 — About</p>
-      <h2 class="text-4xl md:text-5xl font-semibold tracking-tight leading-tight mb-8" data-reveal style="--reveal-delay: 0.05">
-        从「看不懂」<br />到「用出结果」<span class="text-brass">。</span>
-      </h2>
-      <div class="space-y-5 text-white/60 leading-relaxed text-[15px]">
-        <p data-reveal style="--reveal-delay: 0.1">支点脱胎于中南大学一个一百五十人的 MBA AI 交流群。群里的同学大多和 AI 只隔一层——听过、试过，却用不进日常的工作和生意。大家说得最多的一句话是：「看不懂」。</p>
-        <p data-reveal style="--reveal-delay: 0.15">几位在各自领域真正用 AI 拿到过结果的同学——电商操盘、政企产品、全栈技术、财务自动化、社群运营——决定不再让「看不懂」成为一堵墙，把各自的经验拼成一条完整的链路。</p>
-        <p data-reveal style="--reveal-delay: 0.2">「支点」来自阿基米德那句老话：给我一个支点，我就能撬动地球。我们不替你做完所有事，而是帮你找到那个真正能让问题被解决的点。</p>
-      </div>
-    </div>
-    <div class="md:col-span-6 md:col-start-7">
-      <p class="font-mono text-[11px] tracking-[0.35em] text-white/40 uppercase mb-8" data-reveal>价值观 / Values</p>
-      <div class="flex items-baseline justify-between border-t border-white/10 py-6" data-reveal style="--reveal-delay: 0.05">
-        <span class="text-2xl md:text-3xl font-semibold tracking-tight">实战至上</span>
-        <span class="font-mono text-xs text-white/40 tracking-[0.15em]">先做能用的</span>
-      </div>
-      <div class="flex items-baseline justify-between border-t border-white/10 py-6" data-reveal style="--reveal-delay: 0.1">
-        <span class="text-2xl md:text-3xl font-semibold tracking-tight">结果驱动</span>
-        <span class="font-mono text-xs text-white/40 tracking-[0.15em]">没结果不算完</span>
-      </div>
-      <div class="flex items-baseline justify-between border-t border-white/10 py-6" data-reveal style="--reveal-delay: 0.15">
-        <span class="text-2xl md:text-3xl font-semibold tracking-tight">坦诚协作</span>
-        <span class="font-mono text-xs text-white/40 tracking-[0.15em]">有问题摊开说</span>
-      </div>
-      <div class="flex items-baseline justify-between border-t border-white/10 py-6" data-reveal style="--reveal-delay: 0.2">
-        <span class="text-2xl md:text-3xl font-semibold tracking-tight">持续学习</span>
-        <span class="font-mono text-xs text-white/40 tracking-[0.15em]">每天更新</span>
-      </div>
-      <div class="flex items-baseline justify-between border-t border-b border-white/10 py-6" data-reveal style="--reveal-delay: 0.25">
-        <span class="text-2xl md:text-3xl font-semibold tracking-tight text-brass">知止</span>
-        <span class="font-mono text-xs text-white/40 tracking-[0.15em]">接不住，就直说</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- 开物 子品牌 -->
-  <section id="kaiwu" class="relative bg-black/40 backdrop-blur-md border-t border-white/10 px-6 md:px-12 py-16 md:py-24 flex flex-col md:flex-row md:items-center md:justify-between gap-8">
-    <div data-reveal>
-      <p class="font-mono text-[11px] tracking-[0.35em] text-white/40 uppercase mb-4">子品牌 / Sub-brand</p>
-      <h3 class="text-4xl md:text-6xl font-semibold tracking-tight">开物
-        <span class="font-mono text-xs md:text-sm align-middle text-brass tracking-[0.4em] ml-3">KAIWU</span>
-      </h3>
-    </div>
-    <p class="max-w-md text-white/60 leading-relaxed" data-reveal style="--reveal-delay: 0.1">取「天工开物」之意——把技术做成人人可用之物。支点子品牌，与主品牌同一条链路、同一套标准。</p>
-  </section>
-
-  <!-- 03 联系 CTA（视频背景透出） -->
-  <section id="contact" class="relative px-6 md:px-12 py-[28vh]">
-    <p class="font-mono text-[11px] tracking-[0.35em] text-brass uppercase mb-8" data-reveal>03 — Contact</p>
-    <h2 class="font-semibold tracking-tight leading-[1] text-[11.5vw] md:text-[7.5vw]">
-      <span class="block" data-reveal style="--reveal-delay: 0.05">把你的麻烦，</span>
-      <span class="block text-white/40" data-reveal style="--reveal-delay: 0.15">带来给我们看看<span class="text-brass">。</span></span>
-    </h2>
-    <div class="mt-12 flex flex-wrap items-center gap-6" data-reveal style="--reveal-delay: 0.25">
-      <a href="mailto:hello@fulcrum.example" class="pointer-on inline-flex items-center gap-3 border border-white/25 bg-white/5 backdrop-blur-md px-8 py-4 text-sm font-semibold tracking-wide hover:bg-white hover:text-black transition-colors">
-        开始撬动
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-      </a>
-      <span class="font-mono text-xs tracking-[0.2em] text-white/40">从一个校友群出发，到每一个具体的生意现场。</span>
-    </div>
-  </section>
-
-  <!-- Footer -->
-  <footer class="relative bg-black/40 backdrop-blur-md border-t border-white/10 px-6 md:px-12 pt-16 md:pt-20 pb-8">
-    <div class="flex flex-col lg:flex-row lg:justify-between gap-12 mb-16 md:mb-24">
-      <div data-reveal>
-        <p class="text-5xl md:text-7xl font-semibold tracking-tight leading-none">支点<span class="text-brass">.</span></p>
-        <p class="font-mono text-[10px] tracking-[0.5em] text-white/40 uppercase mt-4">Fulcrum — Est. in an MBA group</p>
-      </div>
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-10 md:gap-14 text-sm">
-        <div data-reveal style="--reveal-delay: 0.05">
-          <p class="font-mono text-[10px] tracking-[0.3em] text-white/40 uppercase mb-5">品牌</p>
-          <ul class="space-y-3 text-white/70">
-            <li><a href="#about" class="pointer-on hover:text-white transition-colors">关于支点</a></li>
-            <li><a href="#about" class="pointer-on hover:text-white transition-colors">品牌故事</a></li>
-            <li><a href="#kaiwu" class="pointer-on hover:text-white transition-colors">开物</a></li>
-          </ul>
-        </div>
-        <div data-reveal style="--reveal-delay: 0.1">
-          <p class="font-mono text-[10px] tracking-[0.3em] text-white/40 uppercase mb-5">链路</p>
-          <ul class="space-y-3 text-white/70">
-            <li><a href="#chain" class="pointer-on hover:text-white transition-colors">场景诊断</a></li>
-            <li><a href="#chain" class="pointer-on hover:text-white transition-colors">方案设计</a></li>
-            <li><a href="#chain" class="pointer-on hover:text-white transition-colors">技术落地</a></li>
-            <li><a href="#chain" class="pointer-on hover:text-white transition-colors">项目跟进</a></li>
-          </ul>
-        </div>
-        <div data-reveal style="--reveal-delay: 0.15">
-          <p class="font-mono text-[10px] tracking-[0.3em] text-white/40 uppercase mb-5">场景</p>
-          <ul class="space-y-3 text-white/70">
-            <li><a href="#top" class="pointer-on hover:text-white transition-colors">电商操盘</a></li>
-            <li><a href="#top" class="pointer-on hover:text-white transition-colors">政企产品</a></li>
-            <li><a href="#top" class="pointer-on hover:text-white transition-colors">财务自动化</a></li>
-            <li><a href="#top" class="pointer-on hover:text-white transition-colors">社群运营</a></li>
-          </ul>
-        </div>
-        <div data-reveal style="--reveal-delay: 0.2">
-          <p class="font-mono text-[10px] tracking-[0.3em] text-white/40 uppercase mb-5">联系</p>
-          <ul class="space-y-3 text-white/70">
-            <li><a href="#contact" class="pointer-on hover:text-white transition-colors">商务合作</a></li>
-            <li><a href="#contact" class="pointer-on hover:text-white transition-colors">加入我们</a></li>
-            <li><a href="#contact" class="pointer-on hover:text-white transition-colors">校友群</a></li>
-          </ul>
-        </div>
-      </div>
-    </div>
-    <div class="border-t border-white/10 pt-6 flex flex-col md:flex-row md:items-center md:justify-between gap-3 font-mono text-[10px] tracking-[0.2em] text-white/30 uppercase">
-      <span>© 2026 支点 Fulcrum · 保留所有权利</span>
-      <span class="text-white/50">找到支点，撬动结果。</span>
-      <span>主品牌 支点 / 子品牌 开物</span>
-    </div>
-  </footer>
 
 </main>
 
+<!-- 联系我们 · 微信二维码小框 -->
+<div id="qr-modal" role="dialog" aria-modal="true" aria-labelledby="qr-title" hidden>
+  <div class="qr-panel pointer-events-auto">
+    <div class="flex items-center justify-between mb-2.5">
+      <p id="qr-title" class="font-mono text-[10px] tracking-[0.18em] text-white/45 uppercase">扫码联系</p>
+      <button type="button" id="qr-close" class="font-mono text-[10px] text-white/35 hover:text-white transition-colors" aria-label="关闭">✕</button>
+    </div>
+    <img src="wechat-qr.png" alt="微信二维码" width="188" height="188" />
+    <p class="mt-2.5 text-center text-[11px] text-white/50">微信扫一扫</p>
+  </div>
+</div>
+
 <script>
-  /* ========== 视频加载：多事件 + 3 秒兜底 ========== */
-  const VIDEO_URL = 'hero.mp4';
   const video = document.getElementById('hero-video');
+  const loadNum = document.getElementById('load-num');
+  const loadFill = document.getElementById('load-fill');
   let isLoaded = false;
+  let progress = 0;
+  let targetProgress = 0;
+  let hasEntered = false;
+
+  const setProgress = (value) => {
+    targetProgress = Math.max(targetProgress, Math.min(100, value));
+  };
+
+  const enterSite = () => {
+    if (hasEntered) return;
+    hasEntered = true;
+    document.body.dataset.ready = 'true';
+    document.body.dataset.entered = 'true';
+    document.body.dataset.loaded = 'true';
+    document.body.classList.remove('loading-lock');
+  };
+
+  const tickProgress = () => {
+    progress += (targetProgress - progress) * 0.12;
+    if (targetProgress >= 100 && progress > 99.4) progress = 100;
+    const shown = Math.floor(progress);
+    if (loadNum) loadNum.textContent = String(shown);
+    if (loadFill) loadFill.style.width = `${progress}%`;
+    if (progress < 100) {
+      requestAnimationFrame(tickProgress);
+    } else {
+      enterSite();
+    }
+  };
+  requestAnimationFrame(tickProgress);
+
+  const fakeTimer = setInterval(() => {
+    if (targetProgress >= 90) return;
+    setProgress(targetProgress + Math.random() * 8 + 2);
+  }, 280);
+
   const handleLoaded = () => {
     if (isLoaded) return;
     isLoaded = true;
-    document.body.dataset.loaded = 'true';
+    clearInterval(fakeTimer);
+    setProgress(100);
   };
   if (video) {
     video.addEventListener('loadeddata', handleLoaded);
@@ -329,17 +424,21 @@ tailwind.config = {
     video.addEventListener('canplaythrough', handleLoaded);
     video.load();
   }
-  setTimeout(handleLoaded, 3000);
+  setTimeout(handleLoaded, 3500);
 
-  /* ========== 滚动驱动 scrub（含 seeking guard） ========== */
   window.addEventListener('scroll', () => {
     if (!isLoaded || !video || !video.duration || video.seeking) return;
-    const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
-    const scrollFraction = Math.max(0, Math.min(1, window.scrollY / maxScroll));
+    if (document.body.dataset.entered !== 'true') return;
+    const stopEl = document.getElementById('contact');
+    let stopScroll = document.documentElement.scrollHeight - window.innerHeight;
+    if (stopEl) {
+      const absoluteTop = window.scrollY + stopEl.getBoundingClientRect().top;
+      stopScroll = Math.max(1, absoluteTop - window.innerHeight * 0.2);
+    }
+    const scrollFraction = Math.max(0, Math.min(1, window.scrollY / stopScroll));
     video.currentTime = scrollFraction * video.duration;
   }, { passive: true });
 
-  /* ========== GSAP：大字逐词浮现 + Hero 动效 ========== */
   if (window.gsap && window.ScrollTrigger) {
     gsap.registerPlugin(ScrollTrigger);
 
@@ -365,29 +464,26 @@ tailwind.config = {
         { filter: 'blur(0px)', stagger: 0.05, ease: 'none', scrollTrigger: { trigger: el, start: 'top bottom-=20%', end: 'bottom bottom', scrub: true } });
     });
 
-    /* Hero 入场（loading 屏淡出后触发） */
     const heroIn = () => {
       gsap.fromTo('[data-hero]',
         { y: 44, opacity: 0 },
         { y: 0, opacity: 1, duration: 1.1, stagger: 0.1, ease: 'power3.out' });
     };
-    if (document.body.dataset.loaded === 'true') {
+    if (document.body.dataset.entered === 'true') {
       heroIn();
     } else {
       const mo = new MutationObserver(() => {
-        if (document.body.dataset.loaded === 'true') { heroIn(); mo.disconnect(); }
+        if (document.body.dataset.entered === 'true') { heroIn(); mo.disconnect(); }
       });
-      mo.observe(document.body, { attributes: true, attributeFilter: ['data-loaded'] });
+      mo.observe(document.body, { attributes: true, attributeFilter: ['data-entered'] });
     }
 
-    /* Hero 视差退场 */
     gsap.to('#hero-inner', {
       yPercent: -10, opacity: 0.25, ease: 'none',
       scrollTrigger: { trigger: '#top', start: 'top top', end: 'bottom top', scrub: true }
     });
   }
 
-  /* ========== IntersectionObserver Reveal ========== */
   const revealObserver = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
@@ -397,6 +493,35 @@ tailwind.config = {
     });
   }, { rootMargin: '-50px' });
   document.querySelectorAll('[data-reveal]').forEach((el) => revealObserver.observe(el));
+
+  /* 联系我们 → 二维码弹层 */
+  const qrModal = document.getElementById('qr-modal');
+  const openQr = (e) => {
+    if (e) e.preventDefault();
+    if (!qrModal) return;
+    qrModal.hidden = false;
+    requestAnimationFrame(() => qrModal.classList.add('is-open'));
+    document.body.style.overflow = 'hidden';
+  };
+  const closeQr = () => {
+    if (!qrModal) return;
+    qrModal.classList.remove('is-open');
+    document.body.style.overflow = '';
+    setTimeout(() => { qrModal.hidden = true; }, 300);
+  };
+  document.querySelectorAll('[data-open-qr]').forEach((el) => {
+    el.addEventListener('click', openQr);
+  });
+  const qrClose = document.getElementById('qr-close');
+  if (qrClose) qrClose.addEventListener('click', closeQr);
+  if (qrModal) {
+    qrModal.addEventListener('click', (e) => {
+      if (e.target === qrModal) closeQr();
+    });
+  }
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && qrModal && qrModal.classList.contains('is-open')) closeQr();
+  });
 </script>
 </body>
 </html>
