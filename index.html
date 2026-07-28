@@ -3,8 +3,10 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>支点 Fulcrum — 找到支点，撬动结果。</title>
+<title>支点 Fulcrum</title>
 <meta name="description" content="支点 Fulcrum：帮非技术背景的职场人与中小企业经营者，把 AI 真正用进工作与生意的实战伙伴。" />
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="assets/favicon.svg" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -184,7 +186,7 @@ tailwind.config = {
 <div id="loading" class="fixed inset-0 z-50 bg-black flex flex-col items-center justify-center gap-8 px-6">
   <div class="load-busy flex flex-col items-center gap-8">
     <div class="load-ring">
-      <img src="logo.svg" alt="支点 Fulcrum" class="h-8 w-auto" />
+      <img src="assets/logo.svg" alt="支点 Fulcrum" class="h-8 w-auto" />
     </div>
     <div class="text-center">
       <p class="font-mono text-[11px] track-en text-white/40 uppercase mb-3">Initializing</p>
@@ -199,7 +201,7 @@ tailwind.config = {
 <!-- 视频背景 -->
 <div id="video-bg" class="fixed inset-0 z-0 bg-black">
   <video id="hero-video" muted playsinline preload="auto">
-    <source src="hero.mp4" type="video/mp4" />
+    <source src="assets/hero.mp4" type="video/mp4" />
   </video>
   <div class="absolute inset-0 bg-gradient-to-b from-black/70 via-black/25 to-black/80 pointer-events-none"></div>
 </div>
@@ -208,7 +210,7 @@ tailwind.config = {
 <header class="fixed top-0 inset-x-0 z-20 border-b border-white/10 bg-black/30 backdrop-blur-md">
   <div class="px-6 md:px-12 h-16 flex items-center justify-between">
     <a href="#top" class="pointer-on flex items-center">
-      <img src="logo.svg" alt="支点 Fulcrum" class="h-7 w-auto" />
+      <img src="assets/logo.svg" alt="支点 Fulcrum" class="h-7 w-auto" />
     </a>
     <nav class="flex items-center gap-6 md:gap-10 font-mono text-xs track-meta text-white/60">
       <a href="#about" class="pointer-on hover:text-white transition-colors">关于支点</a>
@@ -276,7 +278,7 @@ tailwind.config = {
               <path d="M18 11h35" />
               <path d="M18 32h35" />
             </svg>
-            <img src="logo.svg" alt="支点 Fulcrum" class="h-[18px] w-auto" />
+            <img src="assets/logo.svg" alt="支点 Fulcrum" class="h-7 md:h-8 w-auto" />
           </div>
           <p class="mt-6 font-mono text-[11px] track-en text-white/50 uppercase leading-relaxed">找到支点，撬动结果</p>
         </div>
@@ -316,7 +318,7 @@ tailwind.config = {
 
         <div class="pt-12 md:pt-16 grid grid-cols-2 md:grid-cols-4 gap-10 md:gap-12" data-reveal style="--reveal-delay: 0.05">
           <div>
-            <img src="logo.svg" alt="支点 Fulcrum" class="h-3.5 w-auto" />
+            <img src="assets/logo.svg" alt="支点 Fulcrum" class="h-6 w-auto" />
             <p class="mt-5 text-[13px] text-white/40 leading-relaxed max-w-[220px]">非技术背景职场人与中小企业经营者身边，AI 落地最信得过的实战伙伴。</p>
           </div>
           <div>
@@ -366,7 +368,7 @@ tailwind.config = {
       <p id="qr-title" class="font-mono text-[10px] tracking-[0.18em] text-white/45 uppercase">扫码联系</p>
       <button type="button" id="qr-close" class="font-mono text-[10px] text-white/35 hover:text-white transition-colors" aria-label="关闭">✕</button>
     </div>
-    <img src="wechat-qr.png" alt="微信二维码" width="268" height="268" />
+    <img src="assets/wechat-qr.png" alt="微信二维码" width="268" height="268" />
     <p class="mt-3 text-center text-xs text-white/50">微信扫一扫</p>
   </div>
 </div>
