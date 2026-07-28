@@ -28,7 +28,7 @@ tailwind.config = {
   html { scroll-behavior: smooth; scroll-padding-top: 5.5rem; }
   body { background: #000; }
   ::selection { background: #2438E6; color: #fff; }
-  #chain, #about, #contact { scroll-margin-top: 5.5rem; }
+  #top, #chain, #about, #contact { scroll-margin-top: 5.5rem; }
 
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
@@ -94,7 +94,7 @@ tailwind.config = {
   .pointer-on { pointer-events: auto; }
 
   .scroll-reveal { margin: 0; }
-  .scroll-reveal-text { display: flex; flex-wrap: wrap; margin: 0; }
+  .scroll-reveal-text { display: block; margin: 0; }
   .word { display: inline-block; white-space: pre; }
 
   [data-reveal] {
@@ -213,8 +213,8 @@ tailwind.config = {
       <img src="assets/logo.svg" alt="支点 Fulcrum" class="h-7 w-auto" />
     </a>
     <nav class="flex items-center gap-6 md:gap-10 font-mono text-xs track-meta text-white/60">
-      <a href="#about" class="pointer-on hover:text-white transition-colors">关于支点</a>
       <a href="#chain" class="pointer-on hover:text-white transition-colors">服务流程</a>
+      <a href="#about" class="pointer-on hover:text-white transition-colors">关于支点</a>
       <a href="https://www.z48704.cloud/" target="_blank" rel="noopener noreferrer" class="pointer-on hover:text-white transition-colors">在线工具</a>
       <a href="#contact" data-open-qr class="pointer-on bg-white text-black px-5 py-2 hover:bg-white/90 transition-colors">联系我们</a>
     </nav>
@@ -254,43 +254,61 @@ tailwind.config = {
   <div class="h-[80px] md:h-[140px]"></div>
 
   <!-- 服务流程 -->
-  <section id="chain" class="relative w-[90%] mx-auto flex flex-col justify-center py-10 md:py-16 pointer-events-auto">
-    <div class="max-w-[1200px] w-full">
-      <p class="font-mono text-[11px] track-en text-brass uppercase mb-6" data-reveal>服务流程</p>
-      <h2 data-scroll-reveal data-text-class="font-semibold track-tight text-white text-[clamp(2rem,4.5vw,4rem)] leading-[1.1] w-full">从判断 值不值得做， 到方案设计、 技术落地、 财务与项目跟进 — 我们为 不会用 AI 的人， 搭起一条 完整的 落地链路。</h2>
+  <section class="relative w-[90%] mx-auto flex flex-col justify-center py-16 md:py-28 pointer-events-auto">
+    <div class="max-w-[920px] w-full">
+      <p id="chain" class="font-mono text-[11px] track-en text-brass uppercase mb-8" data-reveal>服务流程</p>
+
+      <h2 class="font-semibold track-tight text-white text-[clamp(1.6rem,3.2vw,2.75rem)] leading-[1.35]" data-reveal style="--reveal-delay: 0.05">
+        <span class="block text-white/90">从场景诊断、方案设计，</span>
+        <span class="block mt-1">到工具与工作流搭建、培训陪跑与项目复盘。</span>
+      </h2>
+
+      <p class="mt-8 md:mt-10 max-w-2xl text-[15px] md:text-lg leading-[1.75] text-white/55" data-reveal style="--reveal-delay: 0.12">
+        我们帮非技术背景的职场人与中小企业经营者，把 AI 用进真实工作和生意，拿到可验证的结果。
+      </p>
+
+      <div class="mt-12 md:mt-14 flex flex-wrap gap-x-6 gap-y-3 font-mono text-[11px] track-meta text-white/35" data-reveal style="--reveal-delay: 0.18">
+        <span class="text-brass/80">01</span><span>场景诊断</span>
+        <span class="text-white/20">/</span>
+        <span class="text-brass/80">02</span><span>方案设计</span>
+        <span class="text-white/20">/</span>
+        <span class="text-brass/80">03</span><span>工具搭建</span>
+        <span class="text-white/20">/</span>
+        <span class="text-brass/80">04</span><span>培训陪跑</span>
+        <span class="text-white/20">/</span>
+        <span class="text-brass/80">05</span><span>项目复盘</span>
+      </div>
     </div>
   </section>
 
   <div class="h-[64px] md:h-[100px]"></div>
 
   <!-- 关于支点 -->
-  <section id="about" class="relative w-[90%] mx-auto py-10 md:py-16 pointer-events-auto">
-    <div class="max-w-[1200px] w-full">
-      <p class="font-mono text-[11px] track-en text-brass uppercase mb-8" data-reveal>关于支点</p>
-      <div class="grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-8">
-        <div class="md:col-span-4" data-reveal style="--reveal-delay: 0.05">
-          <div class="flex items-center gap-4">
-            <svg width="71" height="43" viewBox="0 0 71 43" fill="none" stroke="white" stroke-width="1" class="opacity-80" aria-hidden="true">
-              <circle cx="35.5" cy="21.5" r="20" />
-              <ellipse cx="35.5" cy="21.5" rx="8.5" ry="20" />
-              <ellipse cx="35.5" cy="21.5" rx="15" ry="20" />
-              <line x1="15.5" y1="21.5" x2="55.5" y2="21.5" />
-              <path d="M18 11h35" />
-              <path d="M18 32h35" />
-            </svg>
-            <img src="assets/logo.svg" alt="支点 Fulcrum" class="h-7 md:h-8 w-auto" />
+  <section class="relative w-[90%] mx-auto py-12 md:py-20 pointer-events-auto">
+    <div class="max-w-[1100px] w-full">
+      <p id="about" class="font-mono text-[11px] track-en text-brass uppercase mb-12 md:mb-16" data-reveal>关于支点</p>
+
+      <div class="border-b border-white/10 pb-12 md:pb-16" data-reveal style="--reveal-delay: 0.05">
+        <div class="flex flex-col md:flex-row md:items-start gap-8 md:gap-16 lg:gap-24">
+          <div class="shrink-0 md:w-[300px] lg:w-[340px]">
+            <img src="assets/logo.svg" alt="支点 Fulcrum" class="h-10 md:h-12 w-auto" />
+            <p class="mt-5 text-base md:text-lg text-white/55 leading-snug tracking-wide">找到支点，撬动结果</p>
           </div>
-          <p class="mt-6 font-mono text-[11px] track-en text-white/50 uppercase leading-relaxed">找到支点，撬动结果</p>
+          <p class="flex-1 max-w-[36rem] md:pt-1 text-[15px] md:text-[17px] text-white/70 leading-[1.85]">「支点 Fulcrum」源起于中南大学 MBA，是一个面向 AI 时代的学习与实践品牌，汇聚来自商业、技术、管理与组织一线的跨领域经验，致力于把前沿认知转化为可学习、可执行、可验证的落地方案。</p>
         </div>
+      </div>
 
-        <div class="md:col-span-4" data-reveal style="--reveal-delay: 0.1">
-          <h3 class="text-xl font-semibold text-white">实战至上 / 结果驱动</h3>
-          <p class="mt-4 text-[15px] text-white/70 leading-relaxed">我们不是教你「懂 AI」，而是在你的具体场景里把麻烦办掉、看到结果。客户侧少学公式，多拿可用的工作流——没结果，不算完。</p>
+      <div class="border-b border-white/10 py-10 md:py-14" data-reveal style="--reveal-delay: 0.08">
+        <div class="flex flex-col md:flex-row md:items-baseline gap-4 md:gap-16 lg:gap-24">
+          <h3 class="shrink-0 md:w-[300px] lg:w-[340px] text-2xl md:text-[1.75rem] lg:text-[2rem] font-semibold track-tight text-white leading-snug">实战至上 / 结果驱动</h3>
+          <p class="flex-1 max-w-[36rem] text-[15px] md:text-base text-white/60 leading-[1.8]">我们不是教你「懂 AI」，而是在你的具体场景里把麻烦办掉、看到结果。不堆概念，不卖术语，只把方法拆成能上手的动作。</p>
         </div>
+      </div>
 
-        <div class="md:col-span-4" data-reveal style="--reveal-delay: 0.15">
-          <h3 class="text-xl font-semibold text-white">坦诚协作 / 知止有度</h3>
-          <p class="mt-4 text-[15px] text-white/70 leading-relaxed">有问题摊开说，接不住就直说。脱胎于中南大学 AI 校友交流群的实战派团队：电商操盘、政企产品、全栈技术、财务自动化、社群运营。</p>
+      <div class="pt-10 md:pt-14" data-reveal style="--reveal-delay: 0.1">
+        <div class="flex flex-col md:flex-row md:items-baseline gap-4 md:gap-16 lg:gap-24">
+          <h3 class="shrink-0 md:w-[300px] lg:w-[340px] text-2xl md:text-[1.75rem] lg:text-[2rem] font-semibold track-tight text-white leading-snug">坦诚协作 / 知止有度</h3>
+          <p class="flex-1 max-w-[36rem] text-[15px] md:text-base text-white/60 leading-[1.8]">我们不急着把 AI 套进每个问题，而是先看清真实场景、关键目标和落地条件，再判断该不该做、怎么做、做到什么程度。</p>
         </div>
       </div>
     </div>
@@ -450,12 +468,15 @@ tailwind.config = {
       el.classList.add('scroll-reveal');
       const p = document.createElement('p');
       p.className = 'scroll-reveal-text ' + (el.dataset.textClass || '');
-      text.split(/(\s+)/).forEach((part) => {
-        if (!part) return;
-        const span = document.createElement('span');
-        span.className = 'word';
-        span.textContent = part;
-        p.appendChild(span);
+      text.split(/\n/).forEach((line, lineIndex) => {
+        if (lineIndex > 0) p.appendChild(document.createElement('br'));
+        line.split(/(\s+)/).forEach((part) => {
+          if (!part) return;
+          const span = document.createElement('span');
+          span.className = 'word';
+          span.textContent = part;
+          p.appendChild(span);
+        });
       });
       el.appendChild(p);
       gsap.fromTo(el, { rotate: 3, transformOrigin: '0% 50%' },
@@ -495,6 +516,30 @@ tailwind.config = {
     });
   }, { rootMargin: '-50px' });
   document.querySelectorAll('[data-reveal]').forEach((el) => revealObserver.observe(el));
+
+  /* 导航锚点：标题落在固定顶栏下方 */
+  const scrollToId = (id) => {
+    const el = document.getElementById(id);
+    if (!el) return false;
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    try { history.pushState(null, '', `#${id}`); } catch (_) {}
+    return true;
+  };
+  document.querySelectorAll('a[href^="#"]').forEach((a) => {
+    a.addEventListener('click', (e) => {
+      if (a.hasAttribute('data-open-qr')) return;
+      const id = (a.getAttribute('href') || '').slice(1);
+      if (!id) return;
+      if (scrollToId(id)) e.preventDefault();
+    });
+  });
+  /* 带 hash 进入时，等布局稳定后再对齐一次 */
+  const hash = (location.hash || '').slice(1);
+  if (hash && document.getElementById(hash)) {
+    requestAnimationFrame(() => {
+      setTimeout(() => scrollToId(hash), 50);
+    });
+  }
 
   /* 联系我们 → 二维码弹层 */
   const qrModal = document.getElementById('qr-modal');
