@@ -632,9 +632,10 @@ tailwind.config = {
   }
   setTimeout(handleLoaded, 3500);
 
-  window.addEventListener('scroll', () => {
-    if (!isLoaded || !video || !video.duration || video.seeking) return;
+  const syncVideoToScroll = () => {
+    if (!isLoaded || !video || !video.duration || !isFinite(video.duration)) return;
     if (document.body.dataset.entered !== 'true') return;
+    if (video.seeking) return;
     const stopEl = document.getElementById('contact');
     let stopScroll = document.documentElement.scrollHeight - window.innerHeight;
     if (stopEl) {
@@ -643,7 +644,18 @@ tailwind.config = {
     }
     const scrollFraction = Math.max(0, Math.min(1, window.scrollY / stopScroll));
     video.currentTime = scrollFraction * video.duration;
-  }, { passive: true });
+  };
+
+  window.addEventListener('scroll', syncVideoToScroll, { passive: true });
+
+  /* 首访冷缓存：3.5s 超时先进站，视频元数据/数据晚到时补一次同步 */
+  if (video) {
+    ['loadedmetadata', 'canplay', 'canplaythrough'].forEach((evt) => {
+      video.addEventListener(evt, () => {
+        if (document.body.dataset.entered === 'true') syncVideoToScroll();
+      });
+    });
+  }
 
   const afterEntered = (callback) => {
     if (document.body.dataset.entered === 'true') {
