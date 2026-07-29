@@ -61,11 +61,22 @@ tailwind.config = {
     .load-ring::before { animation: none; border-color: #2438E6; }
   }
 
+  #video-bg {
+    background-image: url('assets/hero-poster.jpg');
+    background-size: cover;
+    background-position: center;
+  }
+
   #video-bg video {
     position: absolute; top: 50%; left: 50%;
     transform: translate(-50%, -50%);
     min-width: 100%; min-height: 100%;
     object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+  body[data-video-ready="true"] #video-bg video {
+    opacity: 1;
   }
 
   #loading {
@@ -386,8 +397,8 @@ tailwind.config = {
 
 <!-- 视频背景 -->
 <div id="video-bg" class="fixed inset-0 z-0 bg-black">
-  <video id="hero-video" muted playsinline preload="auto">
-    <source src="assets/hero.mp4" type="video/mp4" />
+  <video id="hero-video" muted playsinline autoplay loop preload="metadata" poster="assets/hero-poster.jpg" width="1280" height="720">
+    <source src="assets/hero.optimized.mp4" type="video/mp4" />
   </video>
   <div class="absolute inset-0 bg-gradient-to-b from-black/70 via-black/25 to-black/80 pointer-events-none"></div>
 </div>
@@ -586,6 +597,18 @@ tailwind.config = {
   let targetProgress = 0;
   let hasEntered = false;
 
+  const revealHeroVideo = () => {
+    document.body.dataset.videoReady = 'true';
+  };
+
+  const playHeroVideo = () => {
+    if (!video) return;
+    const playPromise = video.play();
+    if (playPromise && typeof playPromise.catch === 'function') {
+      playPromise.catch(() => {});
+    }
+  };
+
   const setProgress = (value) => {
     targetProgress = Math.max(targetProgress, Math.min(100, value));
   };
@@ -597,6 +620,7 @@ tailwind.config = {
     document.body.dataset.entered = 'true';
     document.body.dataset.loaded = 'true';
     document.body.classList.remove('loading-lock');
+    playHeroVideo();
   };
 
   const tickProgress = () => {
@@ -625,45 +649,19 @@ tailwind.config = {
     setProgress(100);
   };
   if (video) {
-    video.addEventListener('loadeddata', handleLoaded);
-    video.addEventListener('canplay', handleLoaded);
-    video.addEventListener('canplaythrough', handleLoaded);
+    video.addEventListener('loadedmetadata', handleLoaded);
+    video.addEventListener('loadeddata', revealHeroVideo);
+    video.addEventListener('canplay', () => {
+      handleLoaded();
+      revealHeroVideo();
+      playHeroVideo();
+    });
+    video.addEventListener('playing', revealHeroVideo);
     video.load();
   }
-  setTimeout(handleLoaded, 3500);
-
-  const syncVideoToScroll = () => {
-    if (!isLoaded || !video || !video.duration || !isFinite(video.duration)) return;
-    if (document.body.dataset.entered !== 'true') return;
-    if (video.seeking) return;
-    const stopEl = document.getElementById('contact');
-    let stopScroll = document.documentElement.scrollHeight - window.innerHeight;
-    if (stopEl) {
-      const absoluteTop = window.scrollY + stopEl.getBoundingClientRect().top;
-      stopScroll = Math.max(1, absoluteTop - window.innerHeight * 0.2);
-    }
-    const scrollFraction = Math.max(0, Math.min(1, window.scrollY / stopScroll));
-    video.currentTime = scrollFraction * video.duration;
-  };
-
-  let scrollRAF = null;
-  window.addEventListener('scroll', () => {
-    if (scrollRAF) return;
-    scrollRAF = requestAnimationFrame(() => {
-      scrollRAF = null;
-      syncVideoToScroll();
-    });
-  }, { passive: true });
+  setTimeout(handleLoaded, 2200);
 
   /* 首访冷缓存：3.5s 超时先进站，视频元数据/数据晚到时补一次同步 */
-  if (video) {
-    ['loadedmetadata', 'canplay', 'canplaythrough'].forEach((evt) => {
-      video.addEventListener(evt, () => {
-        if (document.body.dataset.entered === 'true') syncVideoToScroll();
-      });
-    });
-  }
-
   const afterEntered = (callback) => {
     if (document.body.dataset.entered === 'true') {
       callback();
