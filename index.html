@@ -646,7 +646,14 @@ tailwind.config = {
     video.currentTime = scrollFraction * video.duration;
   };
 
-  window.addEventListener('scroll', syncVideoToScroll, { passive: true });
+  let scrollRAF = null;
+  window.addEventListener('scroll', () => {
+    if (scrollRAF) return;
+    scrollRAF = requestAnimationFrame(() => {
+      scrollRAF = null;
+      syncVideoToScroll();
+    });
+  }, { passive: true });
 
   /* 首访冷缓存：3.5s 超时先进站，视频元数据/数据晚到时补一次同步 */
   if (video) {
