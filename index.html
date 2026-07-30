@@ -654,15 +654,25 @@ tailwind.config = {
 
     const scrollFraction = Math.max(0, Math.min(1, window.scrollY / stopScroll));
     const targetTime = scrollFraction * video.duration;
-    if (Math.abs(video.currentTime - targetTime) < 0.04) return;
+    const minSeekDelta = scrollFraction > 0.45 ? 0.14 : 0.06;
+    if (Math.abs(video.currentTime - targetTime) < minSeekDelta) return;
     video.currentTime = targetTime;
   };
 
   let scrollRAF = null;
+  let lastVideoSeekAt = 0;
+  let scrollSettleTimer = null;
   window.addEventListener('scroll', () => {
+    clearTimeout(scrollSettleTimer);
+    scrollSettleTimer = setTimeout(syncVideoToScroll, 140);
     if (scrollRAF) return;
     scrollRAF = requestAnimationFrame(() => {
       scrollRAF = null;
+      const now = performance.now();
+      const scrollFraction = Math.max(0, Math.min(1, window.scrollY / Math.max(1, document.documentElement.scrollHeight - window.innerHeight)));
+      const minSeekInterval = scrollFraction > 0.45 ? 180 : 90;
+      if (now - lastVideoSeekAt < minSeekInterval) return;
+      lastVideoSeekAt = now;
       syncVideoToScroll();
     });
   }, { passive: true });
@@ -866,8 +876,6 @@ tailwind.config = {
         { rotate: 0, ease: 'none', scrollTrigger: { trigger: el, start: 'top bottom', end: 'bottom bottom', scrub: true } });
       gsap.fromTo(p.querySelectorAll('.word'), { opacity: 0.1 },
         { opacity: 1, stagger: 0.05, ease: 'none', scrollTrigger: { trigger: el, start: 'top bottom-=20%', end: 'bottom bottom', scrub: true } });
-      gsap.fromTo(p.querySelectorAll('.word'), { filter: 'blur(4px)' },
-        { filter: 'blur(0px)', stagger: 0.05, ease: 'none', scrollTrigger: { trigger: el, start: 'top bottom-=20%', end: 'bottom bottom', scrub: true } });
     });
 
     gsap.to('#hero-inner', {
