@@ -397,7 +397,7 @@ tailwind.config = {
 
 <!-- 视频背景 -->
 <div id="video-bg" class="fixed inset-0 z-0 bg-black">
-  <video id="hero-video" muted playsinline autoplay loop preload="metadata" poster="assets/hero-poster.jpg" width="1280" height="720">
+  <video id="hero-video" muted playsinline preload="metadata" poster="assets/hero-poster.jpg" width="1280" height="720">
     <source src="assets/hero.optimized.mp4" type="video/mp4" />
   </video>
   <div class="absolute inset-0 bg-gradient-to-b from-black/70 via-black/25 to-black/80 pointer-events-none"></div>
@@ -601,14 +601,6 @@ tailwind.config = {
     document.body.dataset.videoReady = 'true';
   };
 
-  const playHeroVideo = () => {
-    if (!video) return;
-    const playPromise = video.play();
-    if (playPromise && typeof playPromise.catch === 'function') {
-      playPromise.catch(() => {});
-    }
-  };
-
   const setProgress = (value) => {
     targetProgress = Math.max(targetProgress, Math.min(100, value));
   };
@@ -620,7 +612,7 @@ tailwind.config = {
     document.body.dataset.entered = 'true';
     document.body.dataset.loaded = 'true';
     document.body.classList.remove('loading-lock');
-    playHeroVideo();
+    syncVideoToScroll();
   };
 
   const tickProgress = () => {
@@ -648,15 +640,47 @@ tailwind.config = {
     clearInterval(fakeTimer);
     setProgress(100);
   };
+
+  const syncVideoToScroll = () => {
+    if (!isLoaded || !video || !video.duration || !isFinite(video.duration)) return;
+    if (document.body.dataset.entered !== 'true' || video.seeking) return;
+
+    const stopEl = document.getElementById('contact');
+    let stopScroll = document.documentElement.scrollHeight - window.innerHeight;
+    if (stopEl) {
+      const absoluteTop = window.scrollY + stopEl.getBoundingClientRect().top;
+      stopScroll = Math.max(1, absoluteTop - window.innerHeight * 0.2);
+    }
+
+    const scrollFraction = Math.max(0, Math.min(1, window.scrollY / stopScroll));
+    const targetTime = scrollFraction * video.duration;
+    if (Math.abs(video.currentTime - targetTime) < 0.04) return;
+    video.currentTime = targetTime;
+  };
+
+  let scrollRAF = null;
+  window.addEventListener('scroll', () => {
+    if (scrollRAF) return;
+    scrollRAF = requestAnimationFrame(() => {
+      scrollRAF = null;
+      syncVideoToScroll();
+    });
+  }, { passive: true });
+
   if (video) {
-    video.addEventListener('loadedmetadata', handleLoaded);
+    video.addEventListener('loadedmetadata', () => {
+      video.pause();
+      handleLoaded();
+      syncVideoToScroll();
+    });
     video.addEventListener('loadeddata', revealHeroVideo);
     video.addEventListener('canplay', () => {
       handleLoaded();
       revealHeroVideo();
-      playHeroVideo();
+      video.pause();
+      syncVideoToScroll();
     });
-    video.addEventListener('playing', revealHeroVideo);
+    video.addEventListener('seeked', syncVideoToScroll);
     video.load();
   }
   setTimeout(handleLoaded, 2200);
